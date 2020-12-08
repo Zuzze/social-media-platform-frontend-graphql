@@ -123,6 +123,7 @@ class Feed extends Component {
     this.setState({ isEditing: false, editPost: null });
   };
 
+  /** Create or edit post */
   finishEditHandler = postData => {
     this.setState({
       editLoading: true
@@ -134,6 +135,7 @@ class Feed extends Component {
     let url = `${process.env.REACT_APP_BASE_URL}/feed/post`;
     let method = "POST";
     if (this.state.editPost) {
+      console.log("editing existing post...");
       url = `${process.env.REACT_APP_BASE_URL}/feed/post/${this.state.editPost._id}`;
       method = "PUT";
     }
@@ -152,7 +154,6 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
-        console.log(resData);
         const post = {
           _id: resData.post._id,
           title: resData.post.title,

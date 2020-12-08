@@ -4,7 +4,6 @@ import Button from "../../Button/Button";
 import "./Post.css";
 
 const post = props => {
-  console.log(props);
   return (
     <article className="post">
       <header className="post__header">

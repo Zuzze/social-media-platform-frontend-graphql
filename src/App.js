@@ -25,6 +25,10 @@ class App extends Component {
   };
 
   componentDidMount() {
+    // This app uses JWT to authenticate requests
+    // If user has valid token, user can continue using the site even when the browser is closed in between
+    // This is because the token is stored in local storage in browser
+    // If token is expired or not found, user will be logged out
     const token = localStorage.getItem("token");
     const expiryDate = localStorage.getItem("expiryDate");
     if (!token || !expiryDate) {
@@ -34,6 +38,7 @@ class App extends Component {
       this.logoutHandler();
       return;
     }
+    // user has valid token in browser, authenticate user
     const userId = localStorage.getItem("userId");
     const remainingMilliseconds =
       new Date(expiryDate).getTime() - new Date().getTime();
@@ -50,6 +55,7 @@ class App extends Component {
   };
 
   logoutHandler = () => {
+    // destroy JWT token on logout
     this.setState({ isAuth: false, token: null });
     localStorage.removeItem("token");
     localStorage.removeItem("expiryDate");
