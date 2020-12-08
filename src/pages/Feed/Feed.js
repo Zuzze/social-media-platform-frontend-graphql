@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from "react";
-
+import openSocket from "socket.io-client";
 import Post from "../../components/Feed/Post/Post";
 import Button from "../../components/Button/Button";
 import FeedEdit from "../../components/Feed/FeedEdit/FeedEdit";
@@ -8,6 +8,8 @@ import Paginator from "../../components/Paginator/Paginator";
 import Loader from "../../components/Loader/Loader";
 import ErrorHandler from "../../components/ErrorHandler/ErrorHandler";
 import "./Feed.css";
+
+const ITEMS_PER_PAGE = 5;
 
 class Feed extends Component {
   state = {
@@ -39,7 +41,54 @@ class Feed extends Component {
       .catch(this.catchError);
 
     this.loadPosts();
+
+    // - WEB SOCKET CONFIGURATION -
+    const socket = openSocket(process.env.REACT_APP_BASE_URL);
+    // event listeners
+    // "posts" is an event name defined on backend
+    socket.on("posts", data => {
+      if (data.action === "create") {
+        console.log("Websocket detected new post");
+        this.addPost(data.post);
+      } else if (data.action === "update") {
+        console.log("Websocket detected post update");
+        this.updatePost(data.post);
+      } else if (data.action === "delete") {
+        console.log("Websocket detected post deletion");
+        this.loadPosts();
+      }
+    });
   }
+
+  addPost = post => {
+    this.setState(prevState => {
+      const updatedPosts = [...prevState.posts];
+      if (prevState.postPage === 1) {
+        // if page is already full pop last item to make room for newest one
+        if (prevState.posts.length >= ITEMS_PER_PAGE) {
+          updatedPosts.pop();
+        }
+        updatedPosts.unshift(post);
+      }
+      return {
+        posts: updatedPosts,
+        totalPosts: prevState.totalPosts + 1
+      };
+    });
+  };
+
+  updatePost = post => {
+    this.setState(prevState => {
+      const updatedPosts = [...prevState.posts];
+      const updatedPostIndex = updatedPosts.findIndex(p => p._id === post._id);
+      if (updatedPostIndex > -1) {
+        updatedPosts[updatedPostIndex] = post;
+      }
+      return {
+        posts: updatedPosts
+      };
+    });
+  };
 
   loadPosts = direction => {
     if (direction) {
@@ -154,25 +203,10 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
-        const post = {
-          _id: resData.post._id,
-          title: resData.post.title,
-          content: resData.post.content,
-          creator: resData.post.creator,
-          createdAt: resData.post.createdAt
-        };
+        // console.log(resData);
         this.setState(prevState => {
-          let updatedPosts = [...prevState.posts];
-          if (prevState.editPost) {
-            const postIndex = prevState.posts.findIndex(
-              p => p._id === prevState.editPost._id
-            );
-            updatedPosts[postIndex] = post;
-          } else if (prevState.posts.length < 2) {
-            updatedPosts = prevState.posts.concat(post);
-          }
           return {
-            posts: updatedPosts,
+            // posts: updatedPosts,
             isEditing: false,
             editPost: null,
             editLoading: false
@@ -272,11 +306,10 @@ class Feed extends Component {
             <Paginator
               onPrevious={this.loadPosts.bind(this, "previous")}
               onNext={this.loadPosts.bind(this, "next")}
-              lastPage={Math.ceil(this.state.totalPosts / 2)}
+              lastPage={Math.ceil(this.state.totalPosts / ITEMS_PER_PAGE)}
               currentPage={this.state.postPage}
             >
               {this.state.posts.map(post => {
-                console.log(post);
                 return (
                   <Post
                     key={post._id}
