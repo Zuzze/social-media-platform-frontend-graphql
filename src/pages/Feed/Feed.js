@@ -23,22 +23,7 @@ class Feed extends Component {
   };
 
   componentDidMount() {
-    fetch(`${process.env.REACT_APP_BASE_URL}/auth/status`, {
-      headers: {
-        Authorization: "Bearer " + this.props.token
-      }
-    })
-      .then(res => {
-        if (res.status !== 200) {
-          throw new Error("Failed to fetch user status.");
-        }
-        return res.json();
-      })
-      .then(resData => {
-        this.setState({ status: resData.status });
-      })
-      .catch(this.catchError);
-
+    this.fetchUserStatus();
     this.loadPosts();
   }
 
@@ -55,7 +40,9 @@ class Feed extends Component {
       page--;
       this.setState({ postPage: page });
     }
-    const graphqlQuery = {
+    // note that using graphQL variables ($) is optional but recommened
+    // without variables, query would look like this
+    /*const graphqlQuery = {
       query: `{
           posts(page: ${page}) {
             posts {
@@ -69,6 +56,72 @@ class Feed extends Component {
               createdAt
             }
             postsInTotal
+          }
+        }
+      `
+    };*/
+    // How to use graphQL variables:
+    // 1) assign name by wrapping the query/mutation inside `query MyQuery` or "mutation MyMutation"
+    // 2) assign variables by using `$` sign
+    // 3) use dynamic value inside the query by using the same name as in args
+    // 4) add second key to query: "variables" where you connect js to your variables
+    const graphqlQuery = {
+      query: `
+        query FetchPosts($page: Int) {
+          posts(page: $page) {
+            posts {
+              _id
+              title
+              content
+              imageUrl
+              creator {
+                name
+              }
+              createdAt
+            }
+            postsInTotal
+          }
+        }
+      `,
+      variables: {
+        page: page
+      }
+    };
+    fetch(`${process.env.REACT_APP_BASE_URL}/graphql`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + this.props.token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(graphqlQuery)
+    })
+      .then(res => {
+        return res.json();
+      })
+      .then(resData => {
+        if (resData.errors) {
+          throw new Error(resData.errors[0].message);
+        }
+        this.setState({
+          posts: resData.data.posts.posts.map(post => {
+            return {
+              ...post,
+              imagePath: post.imageUrl
+            };
+          }),
+          totalPosts: resData.data.posts.postsInTotal,
+          postsLoading: false
+        });
+      })
+      .catch(this.catchError);
+  };
+
+  fetchUserStatus = () => {
+    const graphqlQuery = {
+      query: `
+        {
+          user {
+            status
           }
         }
       `
@@ -86,18 +139,9 @@ class Feed extends Component {
       })
       .then(resData => {
         if (resData.errors) {
-          throw new Error("Loading posts failed.");
+          throw new Error(resData.errors[0].message);
         }
-        this.setState({
-          posts: resData.data.posts.posts.map(post => {
-            return {
-              ...post,
-              imagePath: post.imageUrl
-            };
-          }),
-          totalPosts: resData.data.posts.postsInTotal,
-          postsLoading: false
-        });
+        this.setState({ status: resData.data.user.status });
       })
       .catch(this.catchError);
   };
@@ -171,6 +215,7 @@ class Feed extends Component {
       .then(fileResData => {
         // 2 Save post using GraphQL
         const imageUrl = fileResData.filePath || "undefined";
+        // option a) createPost query
         let graphqlQuery = {
           query: `
           mutation CreateNewPost($title: String!, $content: String!, $imageUrl: String!) {
@@ -193,6 +238,7 @@ class Feed extends Component {
           }
         };
 
+        // option a) editPost query
         if (this.state.editPost) {
           graphqlQuery = {
             query: `
@@ -237,7 +283,7 @@ class Feed extends Component {
           );
         }
         if (resData.errors) {
-          throw new Error("User login failed!");
+          throw new Error(resData.errors[0].message);
         }
         let resDataField = "createPost";
         if (this.state.editPost) {
@@ -294,24 +340,30 @@ class Feed extends Component {
 
   deletePostHandler = postId => {
     this.setState({ postsLoading: true });
-    fetch(`${process.env.REACT_APP_BASE_URL}/feed/post/${postId}`, {
-      method: "DELETE",
+    const graphqlQuery = {
+      query: `
+        mutation {
+          deletePost(id: "${postId}")
+        }
+      `
+    };
+    fetch(`${process.env.REACT_APP_BASE_URL}/graphql`, {
+      method: "POST",
       headers: {
-        Authorization: "Bearer " + this.props.token
-      }
+        Authorization: "Bearer " + this.props.token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(graphqlQuery)
     })
       .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Deleting a post failed!");
-        }
         return res.json();
       })
       .then(resData => {
+        if (resData.errors) {
+          throw new Error(resData.errors[0].message);
+        }
         console.log(resData);
-        this.setState(prevState => {
-          const updatedPosts = prevState.posts.filter(p => p._id !== postId);
-          return { posts: updatedPosts, postsLoading: false };
-        });
+        this.loadPosts();
       })
       .catch(err => {
         console.log(err);

@@ -90,7 +90,7 @@ class App extends Component {
           throw new Error("Validation failed.");
         }
         if (resData.errors) {
-          throw new Error("User login failed.");
+          throw new Error(resData.errors[0].message);
         }
         // resData format for data is always under "data" field and then you have to use query name ("login") as a key
         console.log(resData);
@@ -150,7 +150,7 @@ class App extends Component {
           );
         }
         if (resData.errors) {
-          throw new Error("User creation failed.");
+          throw new Error(resData.errors[0].message);
         }
         console.log(resData);
         this.setState({ isAuth: false, authLoading: false });

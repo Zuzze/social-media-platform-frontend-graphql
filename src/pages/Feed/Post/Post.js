@@ -41,7 +41,7 @@ class Post extends Component {
       })
       .then(resData => {
         if (resData.errors) {
-          throw new Error("Fetching post failed");
+          throw new Error(resData.errors[0].message);
         }
         this.setState({
           title: resData.data.post.title,
