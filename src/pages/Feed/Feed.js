@@ -55,26 +55,47 @@ class Feed extends Component {
       page--;
       this.setState({ postPage: page });
     }
-    fetch(`${process.env.REACT_APP_BASE_URL}/feed/posts?page=${page}`, {
+    const graphqlQuery = {
+      query: `{
+          posts(page: ${page}) {
+            posts {
+              _id
+              title
+              content
+              imageUrl
+              creator {
+                name
+              }
+              createdAt
+            }
+            postsInTotal
+          }
+        }
+      `
+    };
+    fetch(`${process.env.REACT_APP_BASE_URL}/graphql`, {
+      method: "POST",
       headers: {
-        Authorization: "Bearer " + this.props.token
-      }
+        Authorization: "Bearer " + this.props.token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(graphqlQuery)
     })
       .then(res => {
-        if (res.status !== 200) {
-          throw new Error("Failed to fetch posts.");
-        }
         return res.json();
       })
       .then(resData => {
+        if (resData.errors) {
+          throw new Error("Loading posts failed.");
+        }
         this.setState({
-          posts: resData.posts.map(post => {
+          posts: resData.data.posts.posts.map(post => {
             return {
               ...post,
               imagePath: post.imageUrl
             };
           }),
-          totalPosts: resData.totalItems,
+          totalPosts: resData.data.posts.postsInTotal,
           postsLoading: false
         });
       })
@@ -129,39 +150,130 @@ class Feed extends Component {
     this.setState({
       editLoading: true
     });
-    const formData = new FormData();
-    formData.append("title", postData.title);
-    formData.append("content", postData.content);
-    formData.append("image", postData.image);
-    let url = `${process.env.REACT_APP_BASE_URL}/feed/post`;
-    let method = "POST";
-    if (this.state.editPost) {
-      console.log("editing existing post...");
-      url = `${process.env.REACT_APP_BASE_URL}/feed/post/${this.state.editPost._id}`;
-      method = "PUT";
-    }
 
-    fetch(url, {
-      method: method,
-      body: formData,
+    // Images on graphQL
+    // 1) Send image to REST endpoint that returns URL path
+    // 2) Send all data including the path to the image to graphql endpoint
+    const formData = new FormData();
+    formData.append("image", postData.image);
+    if (this.state.editPost) {
+      formData.append("oldPath", this.state.editPost.imagePath);
+    }
+    // 1) Save image to backend via rest
+    fetch(`${process.env.REACT_APP_BASE_URL}/post-image`, {
+      method: "PUT",
       headers: {
         Authorization: "Bearer " + this.props.token
-      }
+      },
+      body: formData
     })
-      .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error("Creating or editing a post failed!");
+      .then(res => res.json())
+      .then(fileResData => {
+        // 2 Save post using GraphQL
+        const imageUrl = fileResData.filePath || "undefined";
+        let graphqlQuery = {
+          query: `
+          mutation CreateNewPost($title: String!, $content: String!, $imageUrl: String!) {
+            createPost(postInput: {title: $title, content: $content, imageUrl: $imageUrl}) {
+              _id
+              title
+              content
+              imageUrl
+              creator {
+                name
+              }
+              createdAt
+            }
+          }
+        `,
+          variables: {
+            title: postData.title,
+            content: postData.content,
+            imageUrl: imageUrl
+          }
+        };
+
+        if (this.state.editPost) {
+          graphqlQuery = {
+            query: `
+              mutation UpdateExistingPost($postId: ID!, $title: String!, $content: String!, $imageUrl: String!) {
+                updatePost(id: $postId, postInput: {title: $title, content: $content, imageUrl: $imageUrl}) {
+                  _id
+                  title
+                  content
+                  imageUrl
+                  creator {
+                    name
+                  }
+                  createdAt
+                }
+              }
+            `,
+            variables: {
+              postId: this.state.editPost._id,
+              title: postData.title,
+              content: postData.content,
+              imageUrl: imageUrl
+            }
+          };
         }
+
+        return fetch(`${process.env.REACT_APP_BASE_URL}/graphql`, {
+          method: "POST",
+          body: JSON.stringify(graphqlQuery),
+          headers: {
+            Authorization: "Bearer " + this.props.token,
+            "Content-Type": "application/json"
+          }
+        });
+      })
+      .then(res => {
         return res.json();
       })
       .then(resData => {
-        // console.log(resData);
+        if (resData.errors && resData.errors[0].status === 422) {
+          throw new Error(
+            "Validation failed. Make sure the email address isn't used yet!"
+          );
+        }
+        if (resData.errors) {
+          throw new Error("User login failed!");
+        }
+        let resDataField = "createPost";
+        if (this.state.editPost) {
+          resDataField = "updatePost";
+        }
+        const post = {
+          _id: resData.data[resDataField]._id,
+          title: resData.data[resDataField].title,
+          content: resData.data[resDataField].content,
+          creator: resData.data[resDataField].creator,
+          createdAt: resData.data[resDataField].createdAt,
+          imagePath: resData.data[resDataField].imageUrl
+        };
         this.setState(prevState => {
+          // update pagination
+          let updatedPosts = [...prevState.posts];
+          let updatedTotalPosts = prevState.totalPosts;
+          if (prevState.editPost) {
+            const postIndex = prevState.posts.findIndex(
+              p => p._id === prevState.editPost._id
+            );
+            updatedPosts[postIndex] = post;
+          } else {
+            updatedTotalPosts++;
+            if (prevState.posts.length >= ITEMS_PER_PAGE) {
+              // if current page limit exceeds, remove oldest posts on the page
+              updatedPosts.pop();
+            }
+            updatedPosts.unshift(post);
+          }
           return {
-            // posts: updatedPosts,
+            posts: updatedPosts,
             isEditing: false,
             editPost: null,
-            editLoading: false
+            editLoading: false,
+            totalPosts: updatedTotalPosts
           };
         });
       })
