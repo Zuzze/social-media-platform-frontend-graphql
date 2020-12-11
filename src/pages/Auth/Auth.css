@@ -1,14 +1,17 @@
 .auth-form {
-    width: 90%;
-    margin: auto;
-    padding: 1rem;
-    border: 1px solid #3b0062;
-    border-radius: 5px;
+  width: 90%;
+  margin: 3em auto;
+  padding: 3em;
+  border-radius: 5px;
+  background-color: #292b30;
+  color: lightgray;
+  -webkit-box-shadow: 10px 10px 25px -6px rgba(0, 0, 0, 1);
+  -moz-box-shadow: 10px 10px 25px -6px rgba(0, 0, 0, 1);
+  box-shadow: 10px 10px 25px -6px rgba(0, 0, 0, 1);
+}
+
+@media (min-width: 768px) {
+  .auth-form {
+    width: 40rem;
   }
-  
-  @media (min-width: 768px) {
-    .auth-form {
-      width: 40rem;
-    }
-  }
-  
+}

@@ -11,6 +11,7 @@ const post = props => {
           Posted by {props.author} on {props.date}
         </h3>
         <h1 className="post__title">{props.title}</h1>
+        <p className="post__content">{props.content}</p>
       </header>
       {/* <div className="post__image">
       <Image imageUrl={props.image} contain />

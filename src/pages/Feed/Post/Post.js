@@ -61,6 +61,7 @@ class Post extends Component {
   render() {
     return (
       <section className="single-post">
+        <a href="/">back</a>
         <h1>{this.state.title}</h1>
         <h2>
           Created by {this.state.author} on {this.state.date}

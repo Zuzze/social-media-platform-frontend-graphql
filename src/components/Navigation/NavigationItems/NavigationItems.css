@@ -19,7 +19,7 @@
 .navigation-item a:hover,
 .navigation-item a:active,
 .navigation-item a.active {
-  color: #fab83f;
+  color: #b1ff8b;
 }
 
 .navigation-item:last-of-type {
@@ -37,5 +37,5 @@
 
 .navigation-item button:hover,
 .navigation-item button:active {
-  color: #fab83f;
+  color: #b1ff8b;
 }

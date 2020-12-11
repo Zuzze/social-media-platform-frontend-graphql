@@ -390,20 +390,7 @@ class Feed extends Component {
           onCancelEdit={this.cancelEditHandler}
           onFinishEdit={this.finishEditHandler}
         />
-        <section className="feed__status">
-          <form onSubmit={this.statusUpdateHandler}>
-            <Input
-              type="text"
-              placeholder="Your status"
-              control="input"
-              onChange={this.statusInputChangeHandler}
-              value={this.state.status}
-            />
-            <Button mode="flat" type="submit">
-              Update
-            </Button>
-          </form>
-        </section>
+
         <section className="feed__control">
           <Button mode="raised" design="accent" onClick={this.newPostHandler}>
             New Post
@@ -449,3 +436,20 @@ class Feed extends Component {
 }
 
 export default Feed;
+
+/**
+ * <section className="feed__status">
+          <form onSubmit={this.statusUpdateHandler}>
+            <Input
+              type="text"
+              placeholder="Your status"
+              control="input"
+              onChange={this.statusInputChangeHandler}
+              value={this.state.status}
+            />
+            <Button mode="flat" type="submit">
+              Update
+            </Button>
+          </form>
+        </section>
+ */
