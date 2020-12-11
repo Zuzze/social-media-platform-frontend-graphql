@@ -66,6 +66,13 @@ class Login extends Component {
   render() {
     return (
       <Auth>
+        <div style={{ textAlign: "center", padding: "1em" }}>
+          <img
+            alt="logo"
+            height="70"
+            src={require("../../assets/ghost-logo.svg")}
+          />
+        </div>
         <form
           onSubmit={e =>
             this.props.onLogin(e, {
@@ -96,9 +103,11 @@ class Login extends Component {
             valid={this.state.loginForm["password"].valid}
             touched={this.state.loginForm["password"].touched}
           />
-          <Button design="raised" type="submit" loading={this.props.loading}>
-            Login
-          </Button>
+          <div style={{ textAlign: "right", paddingTop: "0.5em" }}>
+            <Button design="raised" type="submit" loading={this.props.loading}>
+              Login
+            </Button>
+          </div>
         </form>
       </Auth>
     );

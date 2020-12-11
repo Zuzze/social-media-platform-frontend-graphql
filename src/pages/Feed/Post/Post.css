@@ -5,16 +5,19 @@
   color: lightgray;
 }
 
+.single-post h1 {
+  color: #daa4dd;
+}
+
 .single-post h2 {
   font-size: 1rem;
-  color: #464646;
+  color: gray;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #464646;
+  border-bottom: 2px solid gray;
 }
 
 .single-post__image {
-  height: 20rem;
-  width: 20rem;
+  height: auto;
   margin: 1rem auto;
 }
 

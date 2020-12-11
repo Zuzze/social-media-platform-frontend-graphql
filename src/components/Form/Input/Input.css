@@ -1,6 +1,8 @@
+.input input,
 .input {
   margin: 1rem 0;
   width: 100%;
+  color: lightgray;
 }
 
 .input label {
@@ -15,8 +17,9 @@
   font: inherit;
   padding: 0.25rem 0.5rem;
   width: 100%;
-  border-radius: 3px;
-  border: 1px solid #ccc;
+  background-color: #464952;
+  border-radius: 1em;
+  border: none;
 }
 
 .input .touched.invalid {
@@ -27,6 +30,6 @@
 .input input:focus,
 .input textarea:focus {
   outline: none;
-  border-color: #3b0062;
-  color: #3b0062;
+  border-color: white;
+  color: white;
 }

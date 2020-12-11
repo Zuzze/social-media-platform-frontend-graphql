@@ -138,7 +138,7 @@ class FeedEdit extends Component {
       <Fragment>
         <Backdrop onClick={this.cancelPostChangeHandler} />
         <Modal
-          title="New Post"
+          title="Post"
           acceptEnabled={this.state.formIsValid}
           onCancelModal={this.cancelPostChangeHandler}
           onAcceptModal={this.acceptPostChangeHandler}

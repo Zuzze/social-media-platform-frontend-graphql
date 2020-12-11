@@ -12,4 +12,5 @@ body {
 a,
 a:-webkit-any-link {
   text-decoration: none;
+  color: #a09ce3;
 }

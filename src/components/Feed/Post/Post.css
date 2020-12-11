@@ -1,5 +1,5 @@
 .post {
-  margin: 1rem 0;
+  margin: 1rem;
   border: none;
   background-color: #292b30;
   -webkit-box-shadow: 10px 10px 25px -21px rgba(0, 0, 0, 1);
@@ -9,10 +9,23 @@
   padding: 0.5rem;
 }
 
+.post.creator {
+  background-color: #6862cc;
+}
+.post.creator .post__title {
+  color: white;
+}
+
 .post__meta {
   font-size: 1rem;
   color: #707070;
   margin: 0;
+}
+
+.post__content-wrapper {
+  background-color: #292b30;
+  padding: 1em 1.5em;
+  border-radius: 1em;
 }
 
 .post__content {
@@ -21,8 +34,13 @@
 
 .post__title {
   font-size: 1.5rem;
-  margin: 1rem 0;
-  color: #6862cc;
+  margin: 0.5rem;
+  color: #a09ce3;
+  margin-left: 1em;
+}
+
+.post .creator .post__title {
+  color: white;
 }
 
 .post__image {

@@ -3,24 +3,67 @@
   width: 90%;
   left: 5%;
   top: 20vh;
-  background: white;
+  background: #292b30;
   border-radius: 5px;
   z-index: 200;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
 }
 
 .modal__header {
-  border-bottom: 2px solid #3b0062;
+  border-bottom: 2px solid #a09ce3;
 }
 
 .modal__header h1 {
   font-size: 1.5rem;
-  color: #3b0062;
+  color: #a09ce3;
   margin: 1rem;
 }
 
-.modal__content {
+.modal__content,
+.modal__content .input textarea {
   padding: 1rem;
+}
+.modal__content p {
+  color: lightgray;
+}
+
+.modal__content form * {
+  color: lightgray;
+}
+
+.modal__content form input[type="file"] {
+  background-color: transparent;
+  color: transparent;
+  margin: 0;
+  margin-left: -0.5em;
+}
+
+.modal__content form input[type="file"]::-webkit-file-upload-button {
+  visibility: hidden;
+}
+.modal__content form input[type="file"]::before {
+  content: "Select image...";
+  color: white;
+  display: inline-block;
+  background: #a09ce3;
+  border: transparent;
+  border-radius: 2em;
+  padding: 8px 10px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 10pt;
+}
+.modal__content form input[type="file"]:hover::before {
+  border-color: white;
+}
+.modal__content form input[type="file"]:active {
+  outline: 0;
+}
+.modal__content form input[type="file"] :active::before {
+  background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
 }
 
 .modal__actions {

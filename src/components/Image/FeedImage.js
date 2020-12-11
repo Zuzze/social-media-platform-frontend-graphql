@@ -2,12 +2,13 @@ import React from "react";
 
 import "./Image.css";
 
-const image = props => {
+const FeedImage = props => {
+  console.log(`${process.env.REACT_APP_BASE_URL}/${props.imageUrl}`);
   return (
     <div
       className="image"
       style={{
-        backgroundImage: `url('${props.imageUrl}')`,
+        backgroundImage: `url('${process.env.REACT_APP_BASE_URL}/${props.imageUrl}')`,
         backgroundSize: props.contain ? "contain" : "cover",
         backgroundPosition: props.left ? "left" : "center"
       }}
@@ -15,4 +16,4 @@ const image = props => {
   );
 };
 
-export default image;
+export default FeedImage;

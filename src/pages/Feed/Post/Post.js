@@ -59,9 +59,12 @@ class Post extends Component {
   }
 
   render() {
+    console.log("IMAGE URL", this.state.image);
     return (
       <section className="single-post">
-        <a href="/">back</a>
+        <div style={{ textAlign: "left" }}>
+          <a href="/"> Back</a>
+        </div>
         <h1>{this.state.title}</h1>
         <h2>
           Created by {this.state.author} on {this.state.date}
@@ -69,6 +72,8 @@ class Post extends Component {
         <div className="single-post__image">
           <Image contain imageUrl={this.state.image} />
         </div>
+        {/*<div>Up {this.state.upvotes}</div>
+        <div>Down {this.state.downvotes}</div>*/}
         <p>{this.state.content}</p>
       </section>
     );

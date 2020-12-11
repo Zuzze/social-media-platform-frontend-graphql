@@ -2,7 +2,7 @@ import React, { Component, Fragment } from "react";
 import Post from "../../components/Feed/Post/Post";
 import Button from "../../components/Button/Button";
 import FeedEdit from "../../components/Feed/FeedEdit/FeedEdit";
-import Input from "../../components/Form/Input/Input";
+//import Input from "../../components/Form/Input/Input";
 import Paginator from "../../components/Paginator/Paginator";
 import Loader from "../../components/Loader/Loader";
 import ErrorHandler from "../../components/ErrorHandler/ErrorHandler";
@@ -76,6 +76,7 @@ class Feed extends Component {
               imageUrl
               creator {
                 name
+                _id
               }
               createdAt
             }
@@ -396,6 +397,7 @@ class Feed extends Component {
             New Post
           </Button>
         </section>
+        <br />
         <section className="feed">
           {this.state.postsLoading && (
             <div style={{ textAlign: "center", marginTop: "2rem" }}>
@@ -418,6 +420,9 @@ class Feed extends Component {
                     key={post._id}
                     id={post._id}
                     author={post.creator.name}
+                    isOwnPost={
+                      post.creator._id === localStorage.getItem("userId")
+                    }
                     date={new Date(post.createdAt).toLocaleDateString("en-US")}
                     title={post.title}
                     image={post.imageUrl}
@@ -429,6 +434,7 @@ class Feed extends Component {
               })}
             </Paginator>
           )}
+          <br />
         </section>
       </Fragment>
     );

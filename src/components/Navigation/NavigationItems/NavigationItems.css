@@ -5,6 +5,7 @@
 .navigation-item a {
   text-decoration: none;
   color: white;
+  padding: 0.5em 1em;
 }
 
 .navigation-item.mobile {
@@ -13,13 +14,15 @@
 }
 
 .navigation-item.mobile a {
-  color: #3b0062;
+  color: #6862cc;
 }
 
 .navigation-item a:hover,
 .navigation-item a:active,
 .navigation-item a.active {
-  color: #b1ff8b;
+  color: white;
+  border: 1px solid white;
+  border-radius: 2em;
 }
 
 .navigation-item:last-of-type {
@@ -33,6 +36,9 @@
   color: white;
   cursor: pointer;
   padding: 0;
+}
+.navigation-item.mobile button {
+  margin: 0.5em;
 }
 
 .navigation-item button:hover,

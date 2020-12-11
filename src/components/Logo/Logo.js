@@ -3,15 +3,25 @@ import React from "react";
 import "./Logo.css";
 
 const logo = props => (
-  <h1 className="logo">
+  <div>
     <img
       alt="logo"
-      height="15"
-      style={{ marginRight: "7px", paddingTop: "2px" }}
+      height="25"
+      style={{
+        display: "inline-block",
+        verticalAlign: "middle",
+        marginRight: "7px",
+        paddingTop: "2px"
+      }}
       src={require("../../assets/ghost-logo.svg")}
     />
-    Ghost
-  </h1>
+    <h1
+      className="logo"
+      style={{ display: "inline-block", verticalAlign: "middle" }}
+    >
+      Ghost
+    </h1>
+  </div>
 );
 
 export default logo;
