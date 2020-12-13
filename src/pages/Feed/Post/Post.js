@@ -43,6 +43,7 @@ class Post extends Component {
         if (resData.errors) {
           throw new Error(resData.errors[0].message);
         }
+        console.log(resData);
         this.setState({
           title: resData.data.post.title,
           author: resData.data.post.creator.name,
